@@ -1,0 +1,845 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="static/main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  </head>
+	<body>
+    <div id="lefthandside" class="floatybox">
+      <div id="leftupper">
+        <div id="endpoint_select">
+          <select id="select_function">
+      			<option value="API">API</option>
+      		  <option value="guest">Guest Token</option>
+      		</select>
+          <select id="select_method">
+      			<option value="GET">GET</option>
+      		  <option value="DELETE">DELETE</option>
+      		</select>
+      		<select id="select_paginate">
+      			<option value="">--Select--</option>
+      		  <!--<option value="applications">Applications</option>-->
+            <option class="nodelete" value="attachment/actions/id">Attachment Actions</option>
+      		  <!--<option class="nodelete" value="calls">Calls</option>-->
+            <option value="devices">Devices</option>
+      		  <option class="nodelete" value="events">Events</option>
+            <option class="nodelete" value="licenses">Licenses</option>
+      		  <option value="memberships">Memberships</option>
+      			<option value="messages">Messages</option>
+            <option class="nodelete" value="messages/direct">Messages Direct</option>
+      			<option value="people">People</option>
+            <option class="nodelete" value="people/me">People/Me</option>
+            <option value="places">Places</option>
+            <option class="nodelete" value="roles">Roles</option>
+      			<option value="rooms">Rooms</option>
+            <option class="nodelete" value="rooms/id/meetingInfo">Rooms MeetingInfo</option>
+      			<option value="teams">Teams</option>
+      			<option value="team/memberships">Team Memberships</option>
+      			<option value="webhooks">Webhooks</option>
+      		</select>
+        </div>
+    		<div id="paginator_form">
+    		</div>
+        <div id="paginator_submit" style="display:none;">
+          Paginate:
+          <input type="radio" name="paginate" value="true" checked="checked">True</input>
+          <input type="radio" name="paginate" value="false">False</input>
+          <br/>
+          <div id="paginate_explained"></div>
+          <div id="download_select">
+        		Download:
+        		<select id="select_download" class="download-select-class">
+        		</select>
+            <br/>
+            <i>Note: download of -None- may result in some missing final items</i>
+          </div>
+    		</div>
+        <div id="org_only" style="display:none;">
+          <input id="org_only_checkbox" type="checkbox" checked="checked"/>Report includes only spaces created by your org</input>
+        </div>
+        <div id="message_report_options" style="display:none">
+          <b>Message Report Options:</b><br/>
+          <div class="inner">
+          Individuals: <input type="text" id="messages_agents" class="messages_search_option" placeholder="john@abc.com, jane@abc.com">
+          </div>
+          <div class="inner">
+          Domains: <input type="text" id="messages_domains" class="messages_search_option" placeholder="@example.com, @cisco.com">
+          </div>
+          <div class="inner">
+          Search Terms: <input type="text" id="messages_search_terms" class="messages_search_option" placeholder="Apple, Cat, Lamp">
+          </div>
+        </div>
+        <div id="send_buttons" style="display:none;">
+          <button id="send" class="btn" onclick="sendClick()">Send</button>
+          <button id="cancel" class="btn" onclick="cancelMainClick()">Cancel</button>
+        </div>
+      </div>
+      <div id="request_status">
+  			<b>Request To Send:</b><div id="request_send"></div>
+        <div id="request_details" style="display:none;">Authorization: Bearer &lt;Guest Access Token&gt;</div>
+      </div>
+      <div id="app_results">
+  			<b>Pagination Updates:</b><div id="app_update"></div>
+  		</div>
+    </div>
+    <div id="righthandside" class="floatybox" >
+      <div id="final_results">
+  			<b>Status:</b>
+        <span id="working"></span><span id="wait"></span>
+        <div id="result"></div>
+      </div>
+      <div id=items_container>
+        <b>All Combined Items:</b><div id="all_items"></div>
+      </div>
+    </div>
+    <div id="downloadside" class="floatybox">
+      <div id="download_information">
+        <div id="guest_title" class="tracker" style="display:none"><b>Exchange JWT for Access Token:</b></div>
+        <div id="guest_jwt" class="tracker wordwrap" style="display:none"></div>
+        <div id="guest_button" class="tracker" style="display:none">
+          <button id="exchange" class="btn btnexchange" onclick="sendExchange()">Exchange</button>
+        </div>
+        <div id="guest_token_title" class="tracker" style="display:none"><b>Access Token:</b></div>
+        <div id="guest_token" class="tracker wordwrap" style="display:none"></div>
+        <div id="guest_check" class="tracker" style="display:none">
+          <input type="checkbox" id="authorize_guest"/>Make API Requests as Guest
+        </div>
+        <div id="report_title" class="tracker" style="display:none"><b>Report Generation:</b></div>
+        <div id="report_tracker" class="tracker" style="display:none"></div>
+        <div id="external_rooms" class="tracker" style="display:none"></div>
+        <div id="internal_rooms" class="tracker" style="display:none"></div>
+        <div id="deleted_rooms" class="tracker" style="display:none"></div>
+        <div id="error_rooms" class="tracker" style="display:none"></div>
+      </div>
+      <div id="prebuilt_reports">
+        <div>
+          <b>Reports:</b>
+          <table>
+            <tr class="tableRowClass">
+              <td class="tableCellClass">
+                Report (spaces with...):
+              </td>
+              <td class="tableCellClass">
+                <select id="select_download_report" class="download-select-class">
+                  <option value="">--Select--</option>
+                  <option value="user_report">Both External and Internal Users</option>
+                  <option value="bot_report">Both Bots and Internal Users</option>
+                  <option value="internal_report">Internal Users Only</option>
+                  <option value="all_report">Anyone (all spaces)</option>
+                </select>
+              </td>
+            </tr>
+            <tr class="tableRowClass">
+              <td class="tableCellClass">
+                Start Date:
+              </td>
+              <td class="tableCellClass">
+                <input type="text" id="report_start"/>
+              </td>
+            </tr>
+            <tr class="tableRowClass">
+              <td class="tableCellClass">
+                End Date:
+              </td>
+              <td class="tableCellClass">
+                <input type="text" id="report_end"/>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div id="org_only_report">
+          <input id="org_only_checkbox_report" type="checkbox" checked="checked">Report includes only spaces created by your org</input>
+        </div>
+        <button id="send_report" class="btn" onclick="sendReportClick()">Send</button>
+        <button id="cancel_report" class="btn" onclick="cancelReportClick()">Cancel</button>
+        <div id="report_confirmation" class="report_text">Please note that the report will be sent via Webex from <b>paginate@webex.bot</b>.  If your org restricts bot communication, this bot will need to be allowed, or you will not receive the report.</div>
+      </div>
+      <div id="instructions" style="display:none">
+        <p><b>Download Report Instructions</b></p>
+        <p>In addition to the standard API call functions, this tool contains three custom reports: External/Internal User, Bot/Internal User, and Message Reports.
+        </p>
+        <p>To access the External/Internal or Bot/Internal Reports, select "Events" from the drop down at the top left, then hit the drop down next to Download. These reports use /events to retrieve spaces where external and internal users are both present, or bots and internal users are both present. You must be a compliance office to use either report.
+        </p>
+        <p>To access the Message Report, select "Messages" from the drop down at the top left, then hit the drop down next to Download. Once selected, "Message Report Options" will display at the top right. These are keyword values you can use as search criteria for messages in a particular space, which will then export a report showing the occurrence count for each value. For this to work, you will need to populate the roomId value at the top left and the user logged into this tool must be present in the space; it does not require admin or compliance officer roles.
+        </p>
+      </div>
+    </div>
+  <script type="text/javascript">
+
+      $( "#report_start" ).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        maxDate: 0,
+        dateFormat: "yy-mm-ddT00:00:00.000Z"
+      });
+      $( "#report_end" ).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        maxDate: 0,
+        dateFormat: "yy-mm-ddT00:00:00.000Z"
+      });
+
+    function syntaxHighlight(json, wordwrap) {
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                  if(wordwrap === true) {
+                      cls = 'string wordwrap';
+                  } else {
+                      cls = 'string';
+                  }
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+    var downloadfilename = "results";
+		var arglists = {};
+    var kept_data = [];
+    var kept_data_changed = false;
+    var report_data = [];
+    var report_data_changed = false;
+    var expected_report_data_length = 0;
+    var download_only_limit = 30000;
+    var color_format_limit = 20000;
+    //Request parameters
+    //"applications" is commented out because no scope exists for integrations to use it yet. Should be *almost* working as is, but can't test
+		//arglists["applications"] = ["id", "orgId", "createdBy", "createdByEmail", "botEmail", "type", "submissionStatus", "orgSubmissionStatus", "max"];
+    arglists["attachment/actions/id"] = ["id"];
+    arglists["calls"] = ["status", "roomId", "isHost", "from", "to", "max"];
+    arglists["devices"] = ["personId", "placeId", "orgId", "product", "tag", "connectionStatus", "serial", "software", "upgradeChannel", "errorCode", "capability", "permission", "start", "max"];
+		arglists["events"] = ["actorId", "from", "to", "events_resource", "type", "max"];
+    arglists["licenses"] = ["orgId"];
+		arglists["memberships"] = ["roomId", "personId", "personEmail", "max"];
+		arglists["messages"] = ["roomId", "mentionedPeople", "before", "beforeMessage", "after", "max"];
+    arglists["messages/direct"] = ["personId", "personEmail"];
+		arglists["people"] = ["email", "displayName", "orgId", "max"];
+    arglists["people/me"] = [];
+    arglists["places"] = ["displayName", "orgId", "max"];
+    arglists["roles"] = [];
+		arglists["rooms"] = ["teamId", "type", "sortBy", "max"];
+    arglists["rooms/id/meetingInfo"] = ["roomId"];
+		arglists["teams"] = ["max"];
+		arglists["team/memberships"] = ["teamId", "max"];
+		arglists["webhooks"] = ["max"];
+    arglists["guest"] = ["sub", "name", "iss", "secret"];
+
+    var base_url = "";
+    var params = {}
+    for(var argindex in arglists){
+      for(var paramindex in arglists[argindex]){
+        if (!(arglists[argindex][paramindex] in params)){
+          params[arglists[argindex][paramindex]] = ""
+        }
+      }
+    }
+
+    //var pagination_str_true = 'Result will concatenate paginated responses (making additional "Link" requests as necessary).';
+    var pagination_str_true = '"True" - requests will be made until no more results can be returned (max per request). Set to "False" to limit the number of results.';
+
+    var dots;
+
+    var jwt_post_obj = {
+      "headers":{
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "data":{
+        "sub": "",
+        "name": "",
+        "iss": ""
+      },
+      "secret": ""
+    }
+
+    var base_jwt_post_obj = JSON.parse(JSON.stringify(jwt_post_obj));
+
+		$(document).ready(function () {
+      $('input[type=radio][name=paginate]').change(function() {
+          if (this.value == 'true') {
+              document.getElementById("paginate_explained").innerHTML = pagination_str_true;
+              paginate_explained
+          }
+          else {
+            setFalsePaginationStr();
+          }
+      });
+
+      $("#select_download").change(function () {
+        if($(this).val() == "message_report"){
+          $("#message_report_options").show();
+          $("#org_only").hide();
+        } else {
+          $("#message_report_options").hide();
+          if(["user_report", "bot_report", "internal_report", "all_report"].includes($(this).val()))
+            $("#org_only").show();
+          else
+            $("#org_only").hide();
+        }
+      });
+
+      function functionChange() {
+        var func = $("#select_function").val();
+        $('#paginator_form').empty();
+        if(func == "API"){
+          $("#select_method").show();
+          $("#select_paginate").show();
+          $("#request_status").css('min-height', '70px');
+          dropDownChange();
+        } else {
+          $('#paginator_submit').hide();
+          $("#message_report_options").hide();
+          $("#org_only").hide();
+          $("#select_method").hide();
+          $("#select_paginate").hide();
+          $("#request_details").hide();
+          var table = $('<table>');
+          var arglist = arglists["guest"];
+          for(var index in arglist){
+            var row = $('<tr>').addClass('tableRowClass').append(
+              $('<td>').addClass('tableCellClass').text(arglist[index] + "*:"),
+              $('<td>').addClass('tableCellClass').append($('<input type="text" id="'+arglist[index]+'">').on('input', tokenChangeRequest))
+            );
+            table.append(row);
+          }
+          base_jwt_post_obj = JSON.parse(JSON.stringify(jwt_post_obj));
+          document.getElementById("request_send").innerHTML = "POST<pre>"+pretty(base_jwt_post_obj, true)+"</pre>";
+          $("#request_status").css('min-height', '200px');
+          $('#paginator_form').append(table);
+          $('#send_buttons').show();
+        }
+      }
+
+
+      function dropDownChange() {
+				$('#paginator_form').empty();
+        document.getElementById("request_send").innerHTML = "";
+        $("#message_report_options").hide();
+        $("#org_only").hide();
+        var method = $("#select_method").val();
+        if(method == "DELETE"){
+          $(".nodelete").hide()
+          if($("#select_paginate :selected").attr('class') == "nodelete"){
+            $("#select_paginate").val("");
+          }
+        } else {
+          $(".nodelete").show()
+        }
+				if($("#select_paginate").val() != ""){
+          if($('#authorize_guest').prop('checked')){
+            $("#request_details").show();
+          }
+          var table = $('<table>')
+          var notes = $('<div>').addClass('notes');
+          if(method == "GET"){
+            $("#select_download").empty();
+            $("#select_download")
+              .append($('<option value="">--None--</option>'))
+              .append($('<option value="csv">.csv</option>'))
+              .append($('<option value="txt">.txt</option>'))
+            if($("#select_paginate").val() == "events"){
+              $("#select_download")
+                .append($('<option value="user_report">Both External and Internal Users</option>'))
+                .append($('<option value="bot_report">Both Bots and Internal Users</option>'))
+                .append($('<option value="internal_report">Internal Users Only</option>'))
+                .append($('<option value="all_report">Anyone (all spaces)</option>'))
+            }else if($("#select_paginate").val() == "messages"){
+              $("#select_download")
+                .append($('<option value="message_report">Message Report</option>'))
+            }
+            if($('input[type=radio][name=paginate]').prop('checked') == true){
+              document.getElementById("paginate_explained").innerHTML = pagination_str_true;
+            } else {
+              setFalsePaginationStr();
+            }
+            for(var p in params){
+              params[p] = "";
+            }
+            var arglist = arglists[$('#select_paginate').val()];
+            let datepickers = ["to", "from", "before", "after"];
+  					for(var index in arglist){
+              var extra_text = "";
+              if(arglist[index] == "max"){
+                extra_text = "/per page"
+              } else if (($("#select_paginate").val() == "calls" && arglist[index] == "status") ||
+                         ($("#select_paginate").val() == "messages" && arglist[index] == "roomId") ||
+                         ($("#select_paginate").val() == "team/memberships" && arglist[index] == "teamId") ||
+                         ($("#select_paginate").val() == "attachment/actions/id" && arglist[index] == "id") ||
+                         ($("#select_paginate").val() == "rooms/id/meetingInfo" && arglist[index] == "roomId")){
+                extra_text = "*";
+              }
+              let input_element = $('<input type="text" id="'+arglist[index]+'">').on('input', changeRequest);
+              if(datepickers.includes(arglist[index])){
+                input_element.datepicker({
+                  changeMonth: true,
+                  changeYear: true,
+                  maxDate: 0,
+                  dateFormat: "yy-mm-ddT00:00:00.000Z"
+                });
+              }
+              var row = $('<tr>').addClass('tableRowClass').append(
+                $('<td>').addClass('tableCellClass').text(arglist[index]+extra_text+":"),
+                $('<td>').addClass('tableCellClass').append(input_element)
+              );
+              table.append(row);
+            }
+          $('#paginator_submit').show();
+					} else if(method == "DELETE"){
+            //$("#select_paginate").children("option[value^=attachment/actions/id]").hide()
+            //$(".nodelete").hide()
+            var row = $('<tr>').addClass('tableRowClass').append(
+              $('<td>').addClass('tableCellClass').text("id(s)*:"),
+              $('<td>').addClass('tableCellClass').append($('<input type="text" id="id">').on('input', changeIdRequest))
+            );
+            table.append(row);
+            notes.text("Note: id(s) field can contain multiple, comma separated values.")
+            $('#paginator_submit').hide();
+          }
+          base_url = method+" https://api.ciscospark.com/v1/"+$("#select_paginate").val();
+          document.getElementById("request_send").innerHTML = base_url;
+          $('#paginator_form').append(table);
+          $('#paginator_form').append(notes);
+          $('#send_buttons').show();
+				} else {
+          //document.getElementById("request_details").innerHTML = "";
+          document.getElementById("paginate_explained").innerHTML = "";
+          $('#paginator_submit').hide();
+          $('#send_buttons').hide();
+          $("#request_details").hide();
+        }
+		  }
+
+      function authorizeChange(){
+        var func = $("#select_function").val();
+        var checked = $('#authorize_guest').prop('checked');
+        console.log(checked);
+        if(func == "API"){
+          var handler = $("#select_paginate").val();
+          if(checked && handler != ""){
+            $("#request_details").show();
+          } else {
+            $("#request_details").hide();
+          }
+        }
+      }
+
+      $('#select_function').change(functionChange);
+		  $('#select_paginate').change(dropDownChange);
+      $('#select_method').change(dropDownChange);
+      $('#authorize_guest').change(authorizeChange);
+
+		});
+
+    function setFalsePaginationStr(){
+      var num_str = "default";
+      if($("#max").length !== 0 && $("#max").val() != ""){
+        num_str = $("#max").val();
+      }
+      //var pagination_str_false = "Result will contain no more than "+num_str+" max items (will not make pagination requests).";
+      var pagination_str_false = '"False" - only one request will be made (max is total results). Set to "True" for more results.';
+      document.getElementById("paginate_explained").innerHTML = pagination_str_false;
+    }
+
+    function tokenChangeRequest(e, data){
+      if(e.target.id != "secret"){
+        base_jwt_post_obj["data"][e.target.id] = e.target.value;
+      } else {
+        base_jwt_post_obj[e.target.id] = e.target.value;
+      }
+      document.getElementById("request_send").innerHTML = "POST<pre>"+pretty(base_jwt_post_obj, true)+"</pre>";
+    }
+
+    function changeRequest(e, data){
+      if ($('#select_paginate').val() == "attachment/actions/id"){
+        console.log($('#select_paginate').val());
+        console.log(e.target.id);
+        console.log(base_url);
+        var set_str = base_url.replace("/id", "/"+e.target.value);
+        document.getElementById("request_send").innerHTML = set_str;
+      } else if ($('#select_paginate').val() == "rooms/id/meetingInfo") {
+        console.log($('#select_paginate').val());
+        console.log(e.target.id);
+        console.log(base_url);
+        var set_str = base_url.replace("/id/", "/"+e.target.value+"/");
+        document.getElementById("request_send").innerHTML = set_str;
+      } else {
+        params[e.target.id] = e.target.value;
+        var str_to_add = "";
+        for(var p in params){
+          if(params[p] != ""){
+            str_to_add += p+"="+params[p]+"&"
+          }
+        }
+        var set_str = base_url;
+        if(str_to_add != ""){
+          set_str += "?" + str_to_add.slice(0, -1);
+        }
+        document.getElementById("request_send").innerHTML = set_str;
+        if($("input[name='paginate']:checked").val() == "false"){
+          if(e.target.id == "max"){
+            setFalsePaginationStr();
+          }
+        }
+      }
+    }
+
+    function changeIdRequest(e, data){
+      params[e.target.id] = e.target.value;
+      var str_to_add = "/"+e.target.value;
+      var set_str = base_url;
+      if(str_to_add != ""){
+        set_str += str_to_add;
+      }
+      document.getElementById("request_send").innerHTML = set_str;
+    }
+
+    jQuery.fn.redraw = function() {
+      this.css('display', 'none');
+      var temp = this[0].offsetHeight;
+      this.css('display', '');
+      temp = this[0].offsetHeight;
+    };
+
+
+    function pretty(data, wordwrap){
+      if(data.length < color_format_limit || data.length == undefined){
+        return syntaxHighlight(JSON.stringify(data, undefined, 4), wordwrap);
+      } else {
+        return JSON.stringify(data, undefined, 4);
+      }
+    }
+
+		function safe_tags(str) {
+			return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+		}
+
+    function onCloseFunc(){
+      ws = newWebSocket();
+    }
+
+		function newWebSocket(){
+      if(socket_type == "ws"){
+          var ws = new WebSocket("ws://"+window.location.host+"/websocket");
+      } else {
+        var ws = new WebSocket("wss://"+window.location.host+"/websocket");
+      }
+      ws.onopen = function (evt) {
+        var stringy = JSON.stringify({"resource":"all", "command":"open", "token":token})
+        ws.send(stringy);
+      }
+      ws.onclose = function (evt) {
+        //console.log("websocket closed.  Reopening...")
+        //setTimeout(onCloseFunc, 6000);
+        //alert("Websocket connection to server closed.  You may need to refresh the page to see updates.")
+      }
+			ws.onmessage = function (evt) {
+				 data = JSON.parse(safe_tags(evt.data));
+         if(data instanceof Array){
+           for(var d_index in data){
+             onMessageFunction(data[d_index]);
+           }
+         }else{
+           onMessageFunction(data);
+         }
+			};
+			return ws;
+		}
+		token = "{{token}}";
+    socket_type = "{{socket_type}}"
+	  var ws = newWebSocket();
+
+    function onMessageFunction(data){
+      if(data.resource == "all"){
+        if(data.command == "confirm_exists"){
+          var close_other = confirm("You may have another browser window opened with this integration already.  Click OK to have this window take (or keep) control.");
+          var stringy = JSON.stringify({"resource":"all", "command":"confirm_exists", "result":close_other, "token":token});
+          ws = sendWithRetry(ws, stringy);
+        }
+      }else{
+         if(data.update == undefined){
+           document.getElementById("result").innerHTML = "<pre>"+pretty(data, true)+"</pre>";
+           if(data.success !== undefined){
+             if(data.resource == "guest"){
+               if(data.jwt !== undefined){
+                 $("#guest_title").show();
+                 $("#guest_button").show();
+                 $("#guest_jwt").show();
+                 $("#guest_token_title").hide();
+                 $("#guest_token").hide();
+                 $("#guest_check").hide();
+                 $("#authorize_guest").prop("checked", false);
+                 document.getElementById("guest_jwt").innerHTML = data.jwt;
+               } else if(data.token !== undefined){
+                 $("#guest_button").hide();
+                 document.getElementById("guest_title").innerHTML = "<b>JWT:</b>"
+                 $("#guest_token_title").show();
+                 $("#guest_token").show();
+                 $("#guest_check").show();
+                 document.getElementById("guest_token").innerHTML = data.token;
+               }
+             }
+             clearInterval(dots);
+             document.getElementById("wait").innerHTML = "";
+             if(kept_data_changed){
+               if(kept_data.length > download_only_limit){
+                 document.getElementById("all_items").innerHTML = "Total item count exceeds "+download_only_limit.toString()+".  Data is available for download only up to 100 MB (will not be displayed here).";
+               } else {
+                 document.getElementById("all_items").innerHTML = "<pre>"+pretty(kept_data)+"</pre>";
+                 kept_data_changed = false;
+               }
+             }
+             document.getElementById("working").innerHTML = "";
+           }
+         } else {
+           if(["user_report", "bot_report", "internal_report", "all_report"].includes(data.resource)) {
+               $("#report_title").show();
+               $("#report_tracker").show();
+               $("#external_rooms").show();
+               //$("#internal_rooms").show();
+               $("#deleted_rooms").show();
+               $("#error_rooms").show();
+               document.getElementById("report_tracker").innerHTML = "Reviewed Rooms: " + data.count.toString() + " / " + data.total_expected.toString();
+               document.getElementById("external_rooms").innerHTML = "Applicable Rooms: " + data.found_count;
+               //document.getElementById("internal_rooms").innerHTML = "Other Rooms: " + data.internal_count;
+               document.getElementById("deleted_rooms").innerHTML = "Deleted Rooms: " + data.no_room_count;
+               document.getElementById("error_rooms").innerHTML = "Error Rooms: " + data.error_room_count;
+           } else {
+             if(kept_data.length < download_only_limit){
+               kept_data = kept_data.concat(data.data);
+             }
+             kept_data_changed = true;
+             document.getElementById("app_update").innerHTML = '<pre>'+pretty(data, true)+'</pre>';
+           }
+         }
+      }
+    }
+
+
+    window.setInterval( function() {
+      ws = sendWithRetry(ws, JSON.stringify({"command":"ping"}));
+    }, 5000)
+
+
+    function getUpdate(stringy){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4){
+          console.log(this.responseText == null);
+          console.log(this.responseText == undefined);
+          console.log(this.responseText);
+        }
+      }
+      xhttp.open("POST", "message", true);
+      xhttp.send(stringy);
+    }
+
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.replace(new RegExp(search, "g"), replacement);
+    }
+
+    function startdots(working_value){
+      clearInterval(dots);
+      var working = document.getElementById("working");
+      working.innerHTML = working_value;
+      dots = window.setInterval( function() {
+        var wait = document.getElementById("wait");
+        if ( wait.innerHTML.length > 3 )
+            wait.innerHTML = "";
+        else
+            wait.innerHTML += ".";
+      }, 400);
+    }
+
+    function sendWithRetry(ws, stringy){
+      if(ws.readyState == 1){
+				ws.send(stringy);
+			} else {
+				ws.close();
+				var ws = newWebSocket();
+				setTimeout(function(){ws.send(stringy);}, 3000);
+			}
+      return ws;
+    }
+
+    function getResource(){
+      var resource;
+      if($("#select_function").val() == "API"){
+          var resource = $("#select_paginate").val();
+      } else {
+        var resource = "guest";
+      }
+      return resource;
+    }
+
+    function sendExchange() {
+      //TODO: Needs to do the ... Working... thing during this.
+      var obj = {};
+      obj["resource"] = "guest";
+      obj["command"] = "run";
+      obj["function"] = "exchange";
+      obj["token"] = token;
+      obj["jwt"] = document.getElementById("guest_jwt").innerHTML;
+      var stringy = JSON.stringify(obj);
+      document.getElementById("all_items").innerHTML = "";
+      document.getElementById("result").innerHTML = "";
+      document.getElementById("app_update").innerHTML = "";
+      startdots("Working");
+      ws = sendWithRetry(ws, stringy);
+    }
+
+    function UIWorking(){
+      startdots("Working");
+      kept_data = [];
+      report_data = [];
+      expected_report_data_length = 0;
+      document.getElementById("report_tracker").innerHTML = "";
+      document.getElementById("external_rooms").innerHTML = "";
+      document.getElementById("internal_rooms").innerHTML = "";
+      document.getElementById("deleted_rooms").innerHTML = "";
+      document.getElementById("error_rooms").innerHTML = "";
+      document.getElementById("all_items").innerHTML = "";
+      document.getElementById("result").innerHTML = "";
+      document.getElementById("app_update").innerHTML = "";
+    }
+
+    function sendReportClick() {
+      var obj = {};
+      var prompt_res = null;
+      var arglist = arglists["events"];
+			obj["paginate"] = "true";
+      obj["download"] = $("#select_download_report").val();
+      if(obj["download"] != ""){
+        obj['org_only_checkbox'] = document.getElementById("org_only_checkbox_report").checked;
+        let dates_ok = true;
+        obj['from'] = $("#report_start").val();
+        obj['to'] = $("#report_end").val();
+        if(obj['from'] != "" && obj['to'] != ""){
+          if(obj['from'] > obj['to']){
+            alert('Start Date cannot be after End Date.')
+            dates_ok = false;
+          }
+        }
+        if(dates_ok){
+          UIWorking();
+          $("#report_confirmation").show();
+          obj["command"] = "run";
+          obj["resource"] = "events";
+          obj["events_resource"] = "messages,memberships";
+          obj["method"] = "GET";
+          obj["token"] = token;
+
+          var stringy = JSON.stringify(obj);
+          //console.log(stringy);
+          ws = sendWithRetry(ws, stringy);
+        }
+      } else {
+        alert('Report must be selected.')
+      }
+
+    }
+
+		function sendClick() {
+      var resource = getResource();
+      var http_method = $("#select_method").val();
+      var obj = {};
+      var prompt_res = null;
+      let dates_ok = true;
+      if(resource == "guest"){
+        http_method = "";
+        var arglist = arglists[resource];
+        for(var index in arglist){
+          var x = document.getElementById(arglist[index]).value;
+          obj[arglist[index]] = x;
+        }
+        obj['function'] = "jwt";
+      } else if(http_method == "GET"){
+        var arglist = arglists[resource];
+  			obj["paginate"] = document.querySelector('input[name="paginate"]:checked').value;
+        obj["download"] = $("#select_download").val();
+  			for(var index in arglist){
+  				var x = document.getElementById(arglist[index]).value;
+  				if(x != ""){
+  					obj[arglist[index]] = x;
+  				}
+  			}
+        if(!["", undefined, null].includes(obj['from']) && !["", undefined, null].includes(obj['to'])){
+          if(obj['from'] > obj['to']){
+            alert('From Date cannot be after To Date.')
+            dates_ok = false;
+          }
+        }
+        if(!["", undefined, null].includes(obj['after']) && !["", undefined, null].includes(obj['before'])){
+          if(obj['after'] > obj['before']){
+            alert('After Date cannot be greater than Before Date.')
+            dates_ok = false;
+          }
+        }
+        if(obj['download'] == "message_report"){
+          obj['agents'] = document.getElementById("messages_agents").value;
+          obj['domains'] = document.getElementById("messages_domains").value;
+          obj['search_terms'] = document.getElementById("messages_search_terms").value;
+        } else if(["user_report", "bot_report", "internal_report", "all_report"].includes(obj['download'])) {
+          obj['org_only_checkbox'] = document.getElementById("org_only_checkbox").checked;
+        }
+      } else if(http_method == "DELETE"){
+        obj["ids"] = document.getElementById("id").value;
+        console.log(obj["ids"]);
+        if(obj["ids"] != ""){
+          prompt_res = prompt("To DELETE the provided id(s), you must type the word DELETE here in all caps.");
+          console.log(prompt_res);
+          if(prompt_res != "DELETE"){
+            alert("DELETE not confirmed. No items will be deleted.");
+          }
+        } else {
+          alert("DELETE method requires one or more ids listed in the text field.");
+        }
+      }
+      if(http_method != "DELETE" || (http_method == "DELETE" && prompt_res == "DELETE")){
+        if(dates_ok){
+          UIWorking();
+    			obj["command"] = "run";
+    			obj["resource"] = resource;
+          obj["method"] = http_method;
+    			obj["token"] = token;
+          if(resource != "guest" && $("#authorize_guest").prop("checked")){
+            obj["guest_token"] = document.getElementById("guest_token").innerHTML;
+          }
+    			var stringy = JSON.stringify(obj);
+          //console.log(stringy)
+    			ws = sendWithRetry(ws, stringy);
+        }
+      }
+		}
+    
+    function cancelMainClick(){
+      cancelClick(getResource());
+    }
+
+    function cancelReportClick(){
+      cancelClick("events");
+    }
+
+		function cancelClick(resource){
+      startdots("Cancelling");
+			var obj = {
+								 "command":"cancel",
+                 "resource":resource,
+								 "token":token
+                };
+			var stringy = JSON.stringify(obj);
+			ws = sendWithRetry(ws, stringy);
+		}
+	</script>
+	</body>
+</html>

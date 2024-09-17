@@ -1,0 +1,280 @@
+body {
+  color: #ccc;
+  background-color: #333;
+  font-family: helvetica, arial, sans-serif;
+}
+
+select {
+  margin-top:5px;
+  padding: 4px 5px;
+  border:none;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+input[type=text] {
+  padding: 4px 5px;
+  border:none;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+pre {
+  margin-top: -1px;
+}
+
+.floatybox {
+  float: left;
+  display: inline-block;
+  width: 500px;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+
+.notes {
+  margin-top: 2px;
+  margin-left: 2px;
+  font-style: italic;
+}
+
+
+#lefthandside {
+  border-right: 2px solid #2e2e2e;
+}
+
+#endpoint_select {
+  margin-left: 3px;
+}
+
+#leftupper {
+}
+
+#select_function {
+  margin-bottom:10px;
+}
+
+#paginator_form {
+  min-height: 160px;
+  margin-bottom:10px;
+}
+
+#paginator_submit {
+  min-height:100px;
+  margin-left:3px;
+}
+
+#send_buttons {
+  min-height:70px;
+  margin-left:3px;
+}
+
+.download-select-class {
+  margin-bottom: 5px;
+}
+
+#message_report_options{
+  padding-top: 10px;
+  padding-bottom: 15px;
+}
+
+#messages_after{
+  margin-top:5px;
+}
+
+#request_status {
+  border-top: 2px solid #2a2a2a;
+  padding-top: 10px;
+  width: 500px;
+  min-height: 70px;
+  overflow: scroll;
+}
+
+#app_results {
+  border-top: 2px solid #2a2a2a;
+  padding-top: 10px;
+  width: 500px;
+  overflow: scroll;
+  flex-grow:1;
+  min-height:270px;
+}
+
+#righthandside {
+  padding-left: 10px;
+  border-right: 2px solid #2a2a2a;
+}
+
+#final_results {
+  padding-top: 10px;
+  width: 500px;
+  overflow: scroll;
+  min-height: 153px;
+}
+
+#result {
+}
+
+#working {
+  padding-left: 4px;
+  color: #7ec699;
+}
+
+#request_send {
+  color: #f8c555;
+  white-space: nowrap;
+}
+
+#request_details
+{
+ color: #4be2ff;;
+ margin-top: 3px;
+}
+
+#paginate_explained
+{
+  color: #7ec699;
+  margin-top: 3px;
+  font-style: italic;
+}
+
+#org_only {
+  margin-top: 5px;
+}
+
+#items_container {
+  border-top: 2px solid #2a2a2a;
+  padding-top: 10px;
+  width: 500px;
+  overflow: scroll;
+  flex-grow:1;
+  min-height:550px;
+}
+
+#downloadside {
+  width:500px;
+  border-right: 2px solid #2a2a2a;
+}
+
+#prebuilt_reports {
+  margin-left: 5px;
+  padding-top: 8px;
+}
+
+#download_information {
+}
+
+#instructions {
+  padding-left: 10px;
+  margin-top: -5px;
+}
+
+.inner {
+  position: relative;
+  padding-top: 2px;
+}
+
+.messages_search_option{
+  margin-top:5px;
+}
+
+.btnicon {
+  float:left;
+  padding-left: 5px;
+}
+
+/* Style buttons */
+.widebtn {
+  background-color: #06b1d2;
+  border: none;
+  color: white;
+  padding: 12px 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  width: 250px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Style buttons */
+.btn {
+  background-color: #06b1d2;
+  border: none;
+  color: white;
+  padding: 12px 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  width: 130px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btnexchange {
+  margin-left: 0px;
+}
+
+.btnsmall {
+  color: #06b1d2;
+  cursor: pointer;
+}
+
+.tracker {
+  border: none;
+  color: #4be2ff;
+  padding: 2px 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.report_text {
+  margin-top:10px;
+  font-style: italic;
+  color: #7ec699;
+  display: none;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: #0493af;
+}
+
+.wordwrap {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+#send {
+  margin-left: 0px;
+}
+
+#cancel {
+  margin-left: 0px;
+}
+
+.string { color: #7ec699; }
+.number { color: #f08d49; }
+.boolean { color: #f08d49; }
+.null { color: #905; }
+.key { color: #f8c555; }
+
+::-webkit-scrollbar {
+  width: 12 px;
+}
+
+::-webkit-scrollbar-corner {
+  background:#333;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background:#ccc;
+  border-radius: 4px;
+}

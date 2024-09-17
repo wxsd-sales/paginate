@@ -1,0 +1,5 @@
+/files
+/logs
+/static/files
+.DS_STORE
+*.pyc

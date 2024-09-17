@@ -1,0 +1,10 @@
+*.pyc
+*.sh
+*.pem
+/files
+/logs
+/static/files
+.DS_STORE
+/paginate/files
+/paginate/logs
+/paginate/src/*.old
